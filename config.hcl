@@ -4,6 +4,6 @@ token = "abcd1234"
 
 template {
   source = "/opt/template/haproxy.ctmpl"
-  destination = "/var/haproxy/haproxy.conf"
-  command = "optional command to run when the template is updated"
+  destination = "/opt/haproxy/haproxy.conf"
+  command = "/opt/haproxy/hap.sh"
 }

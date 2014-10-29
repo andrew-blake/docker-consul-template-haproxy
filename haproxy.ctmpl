@@ -1,11 +1,26 @@
 global
-    daemon
-    maxconn {{key "service/haproxy/maxconn"}}
+#    daemon
 
 defaults
-    mode {{key "service/haproxy/mode"}}{{range keyPrefix "service/haproxy/timeouts"}}
-    timeout {{.Key}}{{.Value}}{{end}}
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
 
-listen http-in
-    bind *:8000{{range service "sind.pl"}}
+frontend localnodes
+    bind *:80
+    mode http
+    default_backend web
+
+backend web
+    mode http
+    balance roundrobin
+    option forwardfor
+    http-request set-header X-Forwarded-Port %[dst_port]
+#    http-request add-header X-Forwarded-Proto https if { ssl_fc }
+#    option httpchk HEAD / HTTP/1.1\r\nHost:localhost{{range service "web"}}
     server {{.Node}} {{.Address}}:{{.Port}}{{end}}
+# end    
